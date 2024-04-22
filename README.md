@@ -78,7 +78,7 @@ Possible dependency problem, troubleshoot:
 sudo apt-get update
 sudo apt-get install -y portaudio19-dev python3-pyaudio
 ```
-
+Addresses need to be adjusted accordingly.
 
 ## References
 - [NVIDIA RIVA](https://docs.nvidia.com/deeplearning/riva/user-guide/docs/index.html)
