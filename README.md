@@ -53,7 +53,17 @@ Bonus track: to run live examples (e.g. those at [asr-basics](https://docs.nvidi
 
 ## Flask
 
+### Locally
 Located at where this repository has been cloned (**could be the local machine used for developing** just adjust `config.py`, fundamentally `RIVA_SPEECH_API_URL`), run:
+```
+$ pip install -r requirements.txt
+```
+At react-app
+```
+$ npm install
+$ npm run build
+```
+Run the server
 ```
 $ python main.py
 ```
@@ -62,6 +72,13 @@ To use develop locally using React just go to `react-app` and run:
 $ npm start
 ```
 
+### At AWS
+Possible dependency problem, troubleshoot:
+```
+sudo apt-get update
+sudo apt-get install -y portaudio19-dev python3-pyaudio
+```
+
+
 ## References
 - [NVIDIA RIVA](https://docs.nvidia.com/deeplearning/riva/user-guide/docs/index.html)
-- 

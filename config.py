@@ -1,5 +1,5 @@
 riva_config = {
-    "RIVA_SPEECH_API_URL": "3.99.213.201:50051",
+    "RIVA_SPEECH_API_URL": "127.0.0.1:50051",
     "VERBOSE": True
 }
 
