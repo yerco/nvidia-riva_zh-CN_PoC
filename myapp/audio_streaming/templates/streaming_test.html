@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Audio Streaming Test</title>
+    <!--<script src="/static/js/socket.io.min.js"></script>-->
+    <script src="{{ url_for ('static', filename='js/socket.io.min.js') }}"></script>
+    <!--<script src="{{ url_for ('static', filename='js/myapp-audio-processor.js') }}"></script>-->
+    <script>
+        document.addEventListener('DOMContentLoaded', (event) => {
+            const socket = io();
+            let audioData = [];
+
+            socket.on('connect', function() {
+                socket.emit('my event', {data: 'I\'m connected!'});
+            });
+
+            let recordingState = {
+                audioContext: null,
+                audioStream: null,
+                sourceNode: null,
+                workletNode: null
+            };
+
+            async function startRecording() {
+                try {
+                    recordingState.audioContext = new AudioContext();
+                    await recordingState.audioContext.audioWorklet.addModule("{{ url_for('static', filename='js/myapp-audio-processor.js') }}");
+
+                    recordingState.audioStream = await navigator.mediaDevices.getUserMedia({ audio: true, video: false });
+                    recordingState.sourceNode = recordingState.audioContext.createMediaStreamSource(recordingState.audioStream);
+
+                    recordingState.workletNode = new AudioWorkletNode(recordingState.audioContext, 'myapp-audio-processor');
+
+                    // Handling audio data in worklet processor
+                    recordingState.workletNode.port.onmessage = (event) => {
+                        audioData.push(event.data);
+                        console.log('Received audio data chunk:', event.data.buffer);
+                        // Send data to server
+                        socket.emit('audioIn', event.data);
+                    };
+
+                    recordingState.sourceNode
+                        .connect(recordingState.workletNode)
+                        .connect(recordingState.audioContext.destination);
+                } catch (error) {
+                    console.error("Error starting recording:", error);
+                }
+            }
+
+            async function stopRecording() {
+                if (recordingState.audioStream) {
+                    recordingState.audioStream.getTracks().forEach(track => track.stop());
+                    recordingState.workletNode.disconnect();
+                    recordingState.sourceNode.disconnect();
+                    await recordingState.audioContext.close();
+
+                    // Reset the state
+                    recordingState = {
+                        audioContext: null,
+                        audioStream: null,
+                        sourceNode: null,
+                        workletNode: null
+                    };
+                    console.log("Recording stopped", audioData);
+                    console.log('Number of data chunks captured:', audioData.length);
+                    // Handle or send the recorded audio data as needed
+                    // For example, send it to the server here
+                    socket.emit('end recording', audioData);
+                }
+            }
+
+            document.querySelector("#startBtn").onclick = startRecording;
+            document.querySelector("#stopBtn").onclick = stopRecording;
+        });
+    </script>
+</head>
+<body>
+    <button id="startBtn">Start Streaming</button>
+    <button id="stopBtn">Stop Streaming</button>
+</body>
+</html>

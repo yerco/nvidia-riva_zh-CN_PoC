@@ -1,0 +1,25 @@
+# General Python ignores
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Flask-specific ignores
+instance/
+*.sqlite
+
+# Virtual environment
+myappvenv/
+
+# Environment variables
+.env
+
+# IDE-specific files
+.idea/
+.vscode/
+temp/
+
+myapp.iml
+# generate code from protos using Makefile at common
+# myapp/riva_api
+
+.DS_Store
